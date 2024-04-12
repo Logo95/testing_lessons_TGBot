@@ -1,5 +1,6 @@
 const { Telegraf, session } = require('telegraf');
-const bot = new Telegraf('6935349180:AAH6gWokZ6sfxMGXZKA2zWJVLbWBmzYWqJU');
+const config = require('./config');
+const bot = new Telegraf (config.telegramToken);
 const axios = require('axios');
 const currencySymbolMap = require('currency-symbol-map');
 
@@ -101,7 +102,8 @@ bot.command('password', (ctx) => {
 
 // Получение погоды
 bot.command('weather', async (ctx) => {
-    const apiKey = '24f2c5c8054a09cc970f41f4d2db9c34';
+    //const apiKey = '24f2c5c8054a09cc970f41f4d2db9c34';
+    const apiKey = config.openWeatherMapApiKey;
     const city = 'Saint Petersburg';
     const url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=ru`;
 
@@ -153,8 +155,7 @@ bot.command('random', (ctx) => {
 
 // Конвертация валют
 bot.command('convert', async (ctx) => {
-    const apiKey = 'a96e312e58814a03b84f845e245cda53';
-    //const [fromCurrency, toCurrency, amount] = ctx.message.text.split(' ').slice(1);
+    const apiKey = config.open_erApiKey;
     const [amount, fromCurrency, toCurrency] = ctx.message.text.split(' ').slice(1);
     
     try {
