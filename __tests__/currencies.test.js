@@ -44,6 +44,22 @@ describe('/currencies command', () => {
         expect(ctx.reply).toHaveBeenCalledWith('Произошла ошибка при получении списка валют.');
     });
 
+    it('should return empty list when no currencies are available', async () => {
+        const ctx = {
+            reply: jest.fn()
+        };
+
+        axios.get.mockResolvedValue({
+            data: {
+                rates: {}
+            }
+        });
+
+        await currenciesHandler(ctx);
+
+        expect(ctx.reply).toHaveBeenCalledWith('Доступные валюты:\n');
+    });
+
     afterEach(() => {
         bot.stop('test');
     });

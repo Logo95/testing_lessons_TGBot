@@ -430,9 +430,13 @@ async function currenciesHandler(ctx) {
 bot.command('currencies', currenciesHandler);
 
 
-// Обработка неверных команд
+// Обработка неверных команд и пустых сообщений
 bot.on('message', (ctx) => {
-    ctx.reply('Неизвестная команда. Введите /help для списка команд.');
+    if (!ctx.message.text || ctx.message.text.trim() === '') {
+        ctx.reply('Неизвестная команда. Введите /help для списка команд.');
+    } else {
+        ctx.reply('Неизвестная команда. Введите /help для списка команд.');
+    }
 });
 
 // Экспорт бота и обработчиков команд

@@ -18,6 +18,42 @@ describe('/flip command', () => {
         expect(['Орел', 'Решка']).toContain(response);
     });
 
+    it('should return "Орел" multiple times in a row', () => {
+        const ctx = {
+            reply: jest.fn()
+        };
+
+        jest.spyOn(Math, 'random').mockReturnValue(0.2); // Всегда возвращает "Орел"
+        flipHandler(ctx);
+        flipHandler(ctx);
+        flipHandler(ctx);
+
+        expect(ctx.reply).toHaveBeenCalledTimes(3);
+        ctx.reply.mock.calls.forEach(call => {
+            expect(call[0]).toBe('Орел');
+        });
+
+        Math.random.mockRestore();
+    });
+
+    it('should return "Решка" multiple times in a row', () => {
+        const ctx = {
+            reply: jest.fn()
+        };
+
+        jest.spyOn(Math, 'random').mockReturnValue(0.8); // Всегда возвращает "Решка"
+        flipHandler(ctx);
+        flipHandler(ctx);
+        flipHandler(ctx);
+
+        expect(ctx.reply).toHaveBeenCalledTimes(3);
+        ctx.reply.mock.calls.forEach(call => {
+            expect(call[0]).toBe('Решка');
+        });
+
+        Math.random.mockRestore();
+    });
+
     afterEach(() => {
         bot.stop('test');
     });
