@@ -1,9 +1,15 @@
 const axios = require('axios');
-const { weatherHandler } = require('../index');  // Импортируем обработчик команды
+const { bot, weatherHandler } = require('../index');  // Импортируем бот и обработчик команды
 
 jest.mock('axios');
 
 describe('/weather command', () => {
+    beforeEach(() => {
+        jest.spyOn(bot, 'launch').mockImplementation(() => {});
+        jest.spyOn(bot, 'stop').mockImplementation(() => {});
+        bot.launch();
+    });
+
     it('should return weather information for Saint Petersburg', async () => {
         const ctx = {
             reply: jest.fn()
@@ -33,5 +39,9 @@ describe('/weather command', () => {
         await weatherHandler(ctx);
 
         expect(ctx.reply).toHaveBeenCalledWith('Произошла ошибка при получении данных о погоде.');
+    });
+
+    afterEach(() => {
+        bot.stop('test');
     });
 });

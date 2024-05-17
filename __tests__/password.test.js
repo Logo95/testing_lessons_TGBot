@@ -1,6 +1,12 @@
-const { passwordHandler } = require('../index');  // Импортируем обработчик команды
+const { bot, passwordHandler } = require('../index');  // Импортируем бот и обработчик команды
 
 describe('/password command', () => {
+    beforeEach(() => {
+        jest.spyOn(bot, 'launch').mockImplementation(() => {});
+        jest.spyOn(bot, 'stop').mockImplementation(() => {});
+        bot.launch();
+    });
+
     it('should generate a password of given length', () => {
         const ctx = {
             message: {
@@ -69,5 +75,23 @@ describe('/password command', () => {
 
         const password = ctx.reply.mock.calls[0][0].split(': ')[1];
         expect(password.length).toBe(8);
+    });
+
+    it('should handle length of 0 by setting to default', () => {
+        const ctx = {
+            message: {
+                text: '/password 0'
+            },
+            reply: jest.fn()
+        };
+
+        passwordHandler(ctx);
+
+        const password = ctx.reply.mock.calls[0][0].split(': ')[1];
+        expect(password.length).toBe(8);
+    });
+
+    afterEach(() => {
+        bot.stop('test');
     });
 });

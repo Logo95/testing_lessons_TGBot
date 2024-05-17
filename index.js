@@ -344,7 +344,11 @@ async function jokeHandler(ctx) {
         const fetch = require('node-fetch');
         const response = await fetch('https://api.chucknorris.io/jokes/random');
         const data = await response.json();
-        ctx.reply(data.value);
+        if (data && data.value) {
+            ctx.reply(data.value);
+        } else {
+            ctx.reply('Произошла ошибка при получении шутки.');
+        }
     } catch (error) {
         ctx.reply('Произошла ошибка при получении шутки.');
     }
@@ -360,10 +364,9 @@ function flipHandler(ctx) {
 
 bot.command('flip', flipHandler);
 
-// Определение обработчика команды /random
 function randomHandler(ctx) {
     const [min, max] = ctx.message.text.split(' ').slice(1).map(Number);
-    if (!isNaN(min) && !isNaN(max) && min < max) {
+    if (!isNaN(min) && !isNaN(max) && min <= max) {
         const result = Math.floor(Math.random() * (max - min + 1)) + min;
         ctx.reply(`Случайное число: ${result}`);
     } else {
@@ -372,6 +375,7 @@ function randomHandler(ctx) {
 }
 
 bot.command('random', randomHandler);
+
 
 // Определение обработчика команды /convert
 async function convertHandler(ctx) {
@@ -414,8 +418,9 @@ async function getCurrencyList() {
 // Определение обработчика команды /currencies
 async function currenciesHandler(ctx) {
     try {
-        const currencyList = await getCurrencyList();
-        ctx.reply(`Доступные валюты:\n${currencyList}`);
+        const response = await axios.get('https://open.er-api.com/v6/latest/USD');
+        const currencies = Object.keys(response.data.rates);
+        ctx.reply(`Доступные валюты:\n${currencies.join('\n')}`);
     } catch (error) {
         console.error('Ошибка при получении списка валют:', error);
         ctx.reply('Произошла ошибка при получении списка валют.');
@@ -424,13 +429,15 @@ async function currenciesHandler(ctx) {
 
 bot.command('currencies', currenciesHandler);
 
+
 // Обработка неверных команд
 bot.on('message', (ctx) => {
     ctx.reply('Неизвестная команда. Введите /help для списка команд.');
 });
 
-// Экспорт обработчиков команд
+// Экспорт бота и обработчиков команд
 module.exports = {
+    bot, // Экспортируем бот для его остановки в тестах
     authHandler,
     weatherHandler,
     jokeHandler,

@@ -1,9 +1,15 @@
 const fetch = require('node-fetch');
-const { jokeHandler } = require('../index');  // Импортируем обработчик команды
+const { bot, jokeHandler } = require('../index');  // Импортируем бот и обработчик команды
 
 jest.mock('node-fetch', () => jest.fn());
 
 describe('/joke command', () => {
+    beforeEach(() => {
+        jest.spyOn(bot, 'launch').mockImplementation(() => {});
+        jest.spyOn(bot, 'stop').mockImplementation(() => {});
+        bot.launch();
+    });
+
     it('should return a joke', async () => {
         const ctx = {
             reply: jest.fn()
@@ -28,5 +34,23 @@ describe('/joke command', () => {
         await jokeHandler(ctx);
 
         expect(ctx.reply).toHaveBeenCalledWith('Произошла ошибка при получении шутки.');
+    });
+
+    it('should handle empty joke response', async () => {
+        const ctx = {
+            reply: jest.fn()
+        };
+
+        fetch.mockResolvedValue({
+            json: jest.fn().mockResolvedValue({})
+        });
+
+        await jokeHandler(ctx);
+
+        expect(ctx.reply).toHaveBeenCalledWith('Произошла ошибка при получении шутки.');
+    });
+
+    afterEach(() => {
+        bot.stop('test');
     });
 });

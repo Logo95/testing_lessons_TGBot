@@ -1,6 +1,12 @@
-const { authHandler } = require('../index');  // Импортируем обработчик команды
+const { bot, authHandler } = require('../index');  // Импортируем бот и обработчик команды
 
 describe('/auth command', () => {
+    beforeEach(() => {
+        jest.spyOn(bot, 'launch').mockImplementation(() => {});
+        jest.spyOn(bot, 'stop').mockImplementation(() => {});
+        bot.launch();
+    });
+
     it('should authorize user with correct key', () => {
         const ctx = {
             message: {
@@ -27,5 +33,23 @@ describe('/auth command', () => {
         authHandler(ctx);
         expect(ctx.session.authorized).toBeFalsy();
         expect(ctx.reply).toHaveBeenCalledWith('Неверный ключ авторизации!');
+    });
+
+    it('should prompt for key if none is provided', () => {
+        const ctx = {
+            message: {
+                text: '/auth'
+            },
+            session: {},
+            reply: jest.fn()
+        };
+
+        authHandler(ctx);
+        expect(ctx.session.authorized).toBeFalsy();
+        expect(ctx.reply).toHaveBeenCalledWith('Неверный ключ авторизации!');
+    });
+
+    afterEach(() => {
+        bot.stop('test');
     });
 });
